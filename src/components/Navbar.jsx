@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import {
-  styled, alpha, AppBar, Box, Toolbar, IconButton, Typography,
+  styled, alpha, AppBar, Box, Button, Toolbar, IconButton, Typography,
   InputBase, Badge, MenuItem, Menu
 } from '@mui/material';
 import {
@@ -9,16 +9,17 @@ import {
   Mail as MailIcon, Notifications as NotificationsIcon, MoreVert as MoreIcon
 } from '@mui/icons-material';
 
-
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
   marginRight: theme.spacing(2),
-  marginLeft: 0,
+  marginLeft: theme.spacing(3),
   width: '100%',
-  [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(3), width: 'auto' },
+  [theme.breakpoints.up('sm')]: {
+    width: 'auto',
+  },
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -38,9 +39,21 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('md')]: { width: '20ch' },
+    [theme.breakpoints.up('md')]: {
+      width: '25ch',
+    },
   },
 }));
+
+const NavButton = styled(Button)({
+  color: 'white',
+  textTransform: 'uppercase',
+  fontWeight: 'bold',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderBottom: '2px solid #FFD700',
+  },
+});
 
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -50,53 +63,67 @@ export default function Navbar() {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (e) => setAnchorEl(e.currentTarget);
-  const handleMenuClose       = () => { setAnchorEl(null); handleMobileMenuClose(); };
-  const handleMobileMenuOpen  = (e) => setMobileMoreAnchorEl(e.currentTarget);
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+  const handleMobileMenuOpen = (e) => setMobileMoreAnchorEl(e.currentTarget);
   const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
 
-  const menuId       = 'primary-search-account-menu';
+  const menuId = 'primary-search-account-menu';
   const mobileMenuId = 'primary-search-account-menu-mobile';
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" color='secondary'
-  sx={{
-    width: '100%',
-    maxWidth: '100%',
-    margin: 10,
-    padding:0,
-  }}
->
+      <AppBar
+        position="static"
+        sx={{
+          background: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)',
+          paddingY: 1,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        }}
+      >
         <Toolbar>
-          {/* burger icon */}
           <IconButton size="large" edge="start" color="inherit" sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
 
-          {/* brand */}
-          <Typography variant="h6" noWrap sx={{ display: { xs: 'none', sm: 'block' } }}>
-            MOVIE APP!!
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 'bold',
+              color: '#FFD700',
+              display: { xs: 'none', sm: 'block' },
+              fontFamily: '"Cinzel", serif',
+            }}
+          >
+            🎬 MOVIE HUB
           </Typography>
 
-          {/* search */}
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
+            <StyledInputBase placeholder="Search Movies…" inputProps={{ 'aria-label': 'search' }} />
           </Search>
 
-          {/* grow
           <Box sx={{ flexGrow: 1 }} />
 
-          desktop icons
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent><MailIcon /></Badge>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+            <NavButton>Home</NavButton>
+            <NavButton>Login</NavButton>
+            <NavButton>Genres</NavButton>
+            <NavButton>Favourites</NavButton>
+            {/* <IconButton size="large" color="inherit">
+              <Badge badgeContent={3} color="error">
+                <MailIcon />
+              </Badge>
             </IconButton>
             <IconButton size="large" color="inherit">
-              <Badge badgeContent><NotificationsIcon /></Badge>
-            </IconButton>
+              <Badge badgeContent={7} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton> */}
             <IconButton
               size="large"
               edge="end"
@@ -107,9 +134,8 @@ export default function Navbar() {
             >
               <AccountCircle />
             </IconButton>
-          </Box>/ */}
+          </Box>
 
-          {/* mobile “more” */}
           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -124,7 +150,7 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {/* mobile menu */}
+      
       <Menu
         anchorEl={mobileMoreAnchorEl}
         open={isMobileMenuOpen}
@@ -151,9 +177,9 @@ export default function Navbar() {
           </IconButton>
           <p>Profile</p>
         </MenuItem>
-      </Menu>
+      </Menu> 
 
-      {/* desktop menu */}
+      {/* Profile Menu */}
       <Menu
         anchorEl={anchorEl}
         open={isMenuOpen}
@@ -163,7 +189,7 @@ export default function Navbar() {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+        <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
       </Menu>
     </Box>
   );
