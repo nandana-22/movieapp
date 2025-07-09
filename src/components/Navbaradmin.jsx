@@ -8,6 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
+import Button from '@mui/material/Button';
 
 const Navbaradmin = () => {
   const [auth, setAuth] = React.useState(true);
@@ -21,11 +22,15 @@ const Navbaradmin = () => {
     setAnchorEl(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Adjust token key if needed
+    window.location.href = '/login';  // Redirect to login page
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ backgroundColor: '#00BFFF' }}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          
 
           {/* Centered vertical box */}
           <Box
@@ -48,7 +53,17 @@ const Navbaradmin = () => {
 
           {auth && (
             <div>
-             
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorEl}
@@ -64,8 +79,13 @@ const Navbaradmin = () => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                
+                <MenuItem onClick={() => {
+                  handleClose();
+                  handleLogout();
+                }}>
+                  Logout
+                </MenuItem>
               </Menu>
             </div>
           )}

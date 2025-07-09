@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   styled, alpha, AppBar, Box, Button, Toolbar, IconButton, Typography,
@@ -6,7 +5,7 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon, Search as SearchIcon, AccountCircle,
-  Mail as MailIcon, Notifications as NotificationsIcon, MoreVert as MoreIcon
+  Mail as MailIcon, Notifications as NotificationsIcon, MoreVert as MoreIcon, Login as LoginIcon
 } from '@mui/icons-material';
 
 const Search = styled('div')(({ theme }) => ({
@@ -58,9 +57,11 @@ const NavButton = styled(Button)({
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+  const [loginAnchorEl, setLoginAnchorEl] = useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const isLoginMenuOpen = Boolean(loginAnchorEl);
 
   const handleProfileMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => {
@@ -69,6 +70,9 @@ export default function Navbar() {
   };
   const handleMobileMenuOpen = (e) => setMobileMoreAnchorEl(e.currentTarget);
   const handleMobileMenuClose = () => setMobileMoreAnchorEl(null);
+
+  const handleLoginMenuOpen = (e) => setLoginAnchorEl(e.currentTarget);
+  const handleLoginMenuClose = () => setLoginAnchorEl(null);
 
   const menuId = 'primary-search-account-menu';
   const mobileMenuId = 'primary-search-account-menu-mobile';
@@ -111,19 +115,15 @@ export default function Navbar() {
 
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
             <NavButton>Home</NavButton>
-            <NavButton>Login</NavButton>
+
+            {/* 🔽 Login Button opens dropdown */}
+            <NavButton onClick={handleLoginMenuOpen}>
+              Login
+            </NavButton>
+
             <NavButton>Genres</NavButton>
             <NavButton>Favourites</NavButton>
-            {/* <IconButton size="large" color="inherit">
-              <Badge badgeContent={3} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton size="large" color="inherit">
-              <Badge badgeContent={7} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton> */}
+
             <IconButton
               size="large"
               edge="end"
@@ -150,7 +150,7 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      
+      {/* 📱 Mobile Menu */}
       <Menu
         anchorEl={mobileMoreAnchorEl}
         open={isMobileMenuOpen}
@@ -177,9 +177,9 @@ export default function Navbar() {
           </IconButton>
           <p>Profile</p>
         </MenuItem>
-      </Menu> 
+      </Menu>
 
-      {/* Profile Menu */}
+      {/* 👤 Profile Menu */}
       <Menu
         anchorEl={anchorEl}
         open={isMenuOpen}
@@ -190,6 +190,23 @@ export default function Navbar() {
       >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
         <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+      </Menu>
+
+      {/* 🔐 Login Menu (User/Admin) */}
+      <Menu
+        anchorEl={loginAnchorEl}
+        open={isLoginMenuOpen}
+        onClose={handleLoginMenuClose}
+        id="login-menu"
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem onClick={() => { handleLoginMenuClose(); window.location.href = '/login'; }}>
+          User Login
+        </MenuItem>
+        <MenuItem onClick={() => { handleLoginMenuClose(); window.location.href = '/adminlogin'; }}>
+          Admin Login
+        </MenuItem>
       </Menu>
     </Box>
   );
