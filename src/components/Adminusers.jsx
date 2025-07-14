@@ -1,64 +1,93 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, IconButton, Typography, Box, Tooltip
 } from '@mui/material';
 import BlockIcon from '@mui/icons-material/Block';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import axios from 'axios';
 
 const AdminUsers = () => {
-  const [users, setUsers] = useState([
-    {
-      _id: '1',
-      email: 'john@example.com',
-      isActive: true,
-      isBlocked: false,
-      moviesCount: 3
-    },
-    {
-      _id: '2',
-      email: 'sarah@example.com',
-      isActive: false,
-      isBlocked: true,
-      moviesCount: 1
-    },
-    {
-      _id: '3',
-      email: 'alex@example.com',
-      isActive: true,
-      isBlocked: false,
-      moviesCount: 5
-    }
-  ]);
+  const [users, setUsers] = useState([]);
 
-  const handleBlock = (userId) => {
-    setUsers(prev =>
-      prev.map(user =>
-        user._id === userId ? { ...user, isBlocked: true } : user
-      )
-    );
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/admin/users', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setUsers(res.data);
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleBlock = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:5000/api/admin/users/${userId}/block`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setUsers(prev =>
+        prev.map(user =>
+          user._id === userId ? { ...user, isBlocked: true } : user
+        )
+      );
+    } catch (err) {
+      console.error('Error blocking user:', err);
+    }
   };
 
-  const handleUnblock = (userId) => {
-    setUsers(prev =>
-      prev.map(user =>
-        user._id === userId ? { ...user, isBlocked: false } : user
-      )
-    );
+  const handleUnblock = async (userId) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:5000/api/admin/users/${userId}/unblock`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setUsers(prev =>
+        prev.map(user =>
+          user._id === userId ? { ...user, isBlocked: false } : user
+        )
+      );
+    } catch (err) {
+      console.error('Error unblocking user:', err);
+    }
   };
 
   return (
-    <Box p={3}>
-      <Typography variant="h5" gutterBottom>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)',
+        p: 4,
+        width: '100vw',
+        boxSizing: 'border-box',
+      }}
+    >
+      <Typography variant="h5" gutterBottom sx={{ mb: 3, color: '#333' }}>
         👤 Admin User Management
       </Typography>
-      <TableContainer component={Paper}>
+
+      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
         <Table>
           <TableHead sx={{ backgroundColor: '#f0f0f0' }}>
             <TableRow>
               <TableCell><strong>Email</strong></TableCell>
               <TableCell><strong>Status</strong></TableCell>
-              <TableCell><strong>Movies Uploaded</strong></TableCell>
               <TableCell><strong>Actions</strong></TableCell>
             </TableRow>
           </TableHead>
@@ -67,9 +96,8 @@ const AdminUsers = () => {
               <TableRow key={user._id}>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
-                  {user.isActive ? '🟢 Active' : '🔴 Inactive'}
+                  {user.isBlocked ? '🚫 Blocked' : '🟢 Active'}
                 </TableCell>
-                <TableCell>{user.moviesCount}</TableCell>
                 <TableCell>
                   <Tooltip title="Block User">
                     <IconButton
@@ -92,7 +120,7 @@ const AdminUsers = () => {
             ))}
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={3} align="center">
                   No users found.
                 </TableCell>
               </TableRow>

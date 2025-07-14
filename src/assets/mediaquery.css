@@ -1,0 +1,31 @@
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .area h1 {
+    font-size: 32px;
+  }
+
+  .area h3 {
+    font-size: 18px;
+  }
+
+  .container1 {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .container1 .text {
+    margin-bottom: 20px;
+  }
+
+  .box {
+    width: 100%;
+  }
+
+  .search {
+    flex-direction: column;
+  }
+}

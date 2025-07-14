@@ -29,7 +29,12 @@ const Navbaradmin = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: '#00BFFF' }}>
+      <AppBar
+  position="static"
+  sx={{
+    background: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)',
+  }}
+>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
 
           {/* Centered vertical box */}

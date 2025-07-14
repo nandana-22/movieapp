@@ -1,56 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+
+import {
+  Box, Card, CardMedia, CardContent, Typography, Dialog,
+  DialogTitle, DialogContent, Button, Select, MenuItem,
+  InputLabel, FormControl
+} from '@mui/material';
 import MovieIcon from '@mui/icons-material/Movie';
 import PeopleIcon from '@mui/icons-material/People';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import Button from '@mui/material/Button';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import { useNavigate } from 'react-router-dom'; // ✅ ADD THIS
 
-const stats = [
-  { label: 'Movies', count: 124, icon: <MovieIcon fontSize="large" color="primary" />, bgColor: '#6A1B9A', category: 'content', details: 'Total movies in the database: 124' },
-  { label: 'Users', count: 587, icon: <PeopleIcon fontSize="large" color="secondary" />, bgColor: '#43A047', category: 'people', details: 'Registered users: 587' },
-  { label: 'Reviews', count: 1432, icon: <RateReviewIcon fontSize="large" color="error" />, bgColor: '#E53935', category: 'content', details: 'Total reviews: 1432' },
-  { label: 'Likes', count: 2000, icon: <ThumbUpIcon fontSize="large" color="primary" />, bgColor: '#FB8C00', category: 'interaction', details: 'Total likes on reviews: 2000' },
-  { label: 'Comments', count: 900, icon: <CommentIcon fontSize="large" color="info" />, bgColor: '#3949AB', category: 'interaction', details: 'Total comments: 900' },
-];
+import AdminUsers from './Adminusers';
 
 const Admin = () => {
   const [open, setOpen] = useState(false);
   const [selectedStat, setSelectedStat] = useState(null);
   const [filter, setFilter] = useState('all');
   const [movies, setMovies] = useState([]);
+  const [userCount, setUserCount] = useState(0);
+  const [selectedPage, setSelectedPage] = useState('dashboard');
 
-  const navigate = useNavigate(); // ✅
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/movies');
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/admin/movies', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setMovies(res.data);
       } catch (err) {
         console.error('Failed to fetch movies:', err);
       }
     };
+
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5000/api/admin/users', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserCount(res.data.length);
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      }
+    };
+
     fetchMovies();
+    fetchUsers();
   }, []);
 
   const handleClickOpen = (stat) => {
     if (stat.label === 'Users') {
-      navigate('/admin/users'); // ✅ navigate to route instead of rendering manually
+      setSelectedPage('users');
+    } else if (stat.label === 'Movies') {
+      navigate('/admin/movies');
     } else {
       setSelectedStat(stat);
       setOpen(true);
@@ -62,15 +70,38 @@ const Admin = () => {
     setSelectedStat(null);
   };
 
+  const stats = [
+    { label: 'Movies', count: movies.length, icon: <MovieIcon fontSize="large" color="primary" />, bgColor: '#6A1B9A', category: 'content', details: `Total movies in the database: ${movies.length}` },
+    { label: 'Users', count: userCount, icon: <PeopleIcon fontSize="large" color="secondary" />, bgColor: '#43A047', category: 'people', details: `Registered users: ${userCount}` },
+    { label: 'Reviews', count: 1432, icon: <RateReviewIcon fontSize="large" color="error" />, bgColor: '#E53935', category: 'content', details: 'Total reviews: 1432' },
+    { label: 'Likes', count: 2000, icon: <ThumbUpIcon fontSize="large" color="primary" />, bgColor: '#FB8C00', category: 'interaction', details: 'Total likes on reviews: 2000' },
+    { label: 'Comments', count: 900, icon: <CommentIcon fontSize="large" color="info" />, bgColor: '#3949AB', category: 'interaction', details: 'Total comments: 900' },
+  ];
+
   const filteredStats = filter === 'all' ? stats : stats.filter(stat => stat.category === filter);
 
+  if (selectedPage === 'users') return <AdminUsers />;
+
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)', p: 4 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)',
+        p: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100vw',
+        boxSizing: 'border-box',
+        overflowX: 'hidden',
+      }}
+    >
       <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" color="#333">
         Welcome to the Admin Dashboard
       </Typography>
 
-      <Box sx={{ width: 200, mb: 4, mx: 'auto' }}>
+      <Box sx={{ width: 200, mb: 4 }}>
         <FormControl fullWidth>
           <InputLabel id="filter-label">Filter</InputLabel>
           <Select
@@ -88,7 +119,17 @@ const Admin = () => {
         </FormControl>
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 3,
+          flexWrap: 'wrap',
+          width: '100%',
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}
+      >
         {filteredStats.map(({ label, count, icon, bgColor, details }) => (
           <Card
             key={label}
@@ -116,56 +157,6 @@ const Admin = () => {
             </CardContent>
           </Card>
         ))}
-      </Box>
-
-      <Box sx={{ mt: 6, px: 3 }}>
-        <Typography variant="h6" gutterBottom color="#333" fontWeight="medium">
-          Recent Movies
-        </Typography>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            overflowX: 'auto',
-            py: 1,
-            '&::-webkit-scrollbar': { height: 8 },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#888',
-              borderRadius: 4,
-            },
-            '&::-webkit-scrollbar-track': {
-              backgroundColor: '#f0f0f0',
-            },
-          }}
-        >
-          {movies.map((movie) => (
-            <Card
-              key={movie._id}
-              sx={{
-                width: 150,
-                cursor: 'pointer',
-                flexShrink: 0,
-                transition: 'transform 0.2s ease',
-                '&:hover': { transform: 'scale(1.05)' },
-              }}
-            >
-              <CardMedia
-                component="img"
-                height="225"
-                image={movie.posterUrl}
-                alt={movie.title}
-              />
-              <CardContent>
-                <Typography variant="subtitle1" noWrap>
-                  {movie.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {movie.releaseYear}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </Box>
       </Box>
 
       <Dialog open={open} onClose={handleClose}>

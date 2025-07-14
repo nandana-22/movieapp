@@ -1,53 +1,102 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
+// Admin Components
 import AdminLogin from './components/Adminlogin';
 import AdminDashboard from './components/Admin';
 import AdminUsers from './components/Adminusers';
+import AdminMovies from './components/Adminmovies';
 import AdminNavbar from './components/Navbaradmin';
-import './App.css';
 
-function App() {
+// User Components
+import Navbar from './components/Navbar';
+import MovieList from './components/Movielist';
+import Login from './components/Login'; 
+import HomeAttractive from './components/Homeattractive';
+
+function AppRoutes({ isLoggedIn, setIsLoggedIn }) {
   return (
     <Routes>
-      <Route path="/adminlogin" element={<AdminLogin />} />
+      {/* Login Route */}
+      <Route
+        path="/login"
+        element={
+          isLoggedIn ? <Navigate to="/home" replace /> : <Login setIsLoggedIn={setIsLoggedIn} />
+        }
+      />
 
+      {/* Home (after login) */}
+      <Route
+        path="/home"
+        element={
+          isLoggedIn ? (
+            <>
+              <Navbar setIsLoggedIn={setIsLoggedIn} />
+              <HomeAttractive />
+            </>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* Movies */}
+      <Route
+        path="/movies"
+        element={
+          isLoggedIn ? (
+            <>
+              <Navbar setIsLoggedIn={setIsLoggedIn} />
+              <MovieList />
+            </>
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+
+      {/* Default route → redirect to login or home */}
+      <Route
+        path="/"
+        element={<Navigate to={isLoggedIn ? '/home' : '/login'} replace />}
+      />
+
+      {/* ADMIN Routes */}
+      <Route path="/adminlogin" element={<AdminLogin />} />
       <Route
         path="/admin"
         element={
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <>
             <AdminNavbar />
-            <div style={{ flex: 1 }}>
-              <AdminDashboard />
-            </div>
-          </div>
+            <AdminDashboard />
+          </>
         }
       />
+      <Route path="/admin/users" element={<AdminUsers />} />
+      <Route path="/admin/movies" element={<AdminMovies />} />
 
-      <Route
-        path="/admin/users"
-        element={
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <AdminNavbar />
-            <div style={{ flex: 1 }}>
-              <AdminUsers />
-            </div>
-          </div>
-        }
-      />
-
-      <Route
-        path="*"
-        element={
-          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Navbar />
-            <div style={{ flex: 1, padding: '40px', textAlign: 'center' }}>
-              <h2>404 - Page Not Found</h2>
-            </div>
-          </div>
-        }
-      />
+      {/* 404 Page */}
+      <Route path="*" element={<h2 style={{ padding: '40px' }}>404 - Not Found</h2>} />
     </Routes>
+  );
+}
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <AppRoutes isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+    </BrowserRouter>
   );
 }
 
