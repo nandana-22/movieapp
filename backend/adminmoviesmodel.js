@@ -6,6 +6,8 @@ const movieSchema = new mongoose.Schema({
   image: String,
   shortdesc: String,
   longdesc: String,
+  trailer: String,
+  genre: { type: String, default: 'Other' }, // 🎯 NEW FIELD
   createdAt: { type: Date, default: Date.now }
 });
 

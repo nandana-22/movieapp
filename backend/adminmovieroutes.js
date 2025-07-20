@@ -12,11 +12,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST a new movie
+// POST a new movie ✅ trailer & genre included
 router.post('/', async (req, res) => {
   try {
-    const { title, date, image, shortdesc, longdesc } = req.body;
-    const newMovie = new Movie({ title, date, image, shortdesc, longdesc });
+    const { title, date, image, shortdesc, longdesc, trailer, genre } = req.body;
+    const newMovie = new Movie({ title, date, image, shortdesc, longdesc, trailer, genre });
     await newMovie.save();
     res.status(201).json({ message: 'Movie added successfully' });
   } catch (err) {
@@ -37,13 +37,13 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// PUT (edit/update) a movie by ID
+// PUT (edit/update) a movie by ID ✅ trailer & genre included
 router.put('/:id', async (req, res) => {
   try {
-    const { title, date, image, shortdesc, longdesc } = req.body;
+    const { title, date, image, shortdesc, longdesc, trailer, genre } = req.body;
     const updatedMovie = await Movie.findByIdAndUpdate(
       req.params.id,
-      { title, date, image, shortdesc, longdesc },
+      { title, date, image, shortdesc, longdesc, trailer, genre },
       { new: true }
     );
     if (!updatedMovie) {

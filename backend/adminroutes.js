@@ -1,20 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 const Admin = require('./admincredentials');
 const User = require('./adminusersmodel');
-
-// ✅ Movie Schema (can stay here or imported)
-const movieSchema = new mongoose.Schema({
-  title: String,
-  date: String,
-  image: String,
-  shortdesc: String,
-  longdesc: String,
-  createdAt: { type: Date, default: Date.now }
-});
-const Movie = mongoose.model('Movie', movieSchema);
+const Movie = require('./adminmoviesmodel');
 
 // ✅ Middleware: Verify JWT
 const auth = (req, res, next) => {
@@ -32,7 +21,7 @@ const auth = (req, res, next) => {
   }
 };
 
-// ✅ Middleware: Check Admin
+// ✅ Middleware: Check Admin Role
 const requireAdmin = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ message: 'Admins only' });
@@ -41,7 +30,7 @@ const requireAdmin = (req, res, next) => {
 };
 
 //
-// 🔐 Admin Login route – must come before auth middleware
+// 🔐 Admin Login route (before auth middleware)
 //
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +53,7 @@ router.post('/login', async (req, res) => {
 });
 
 //
-// 🔒 All routes below are protected
+// 🔒 Protected Routes Below
 //
 router.use(auth, requireAdmin);
 
@@ -82,8 +71,8 @@ router.get('/movies', async (req, res) => {
 
 router.post('/movies', async (req, res) => {
   try {
-    const { title, date, image, shortdesc, longdesc } = req.body;
-    const movie = new Movie({ title, date, image, shortdesc, longdesc });
+    const { title, date, image, shortdesc, longdesc, trailer } = req.body;
+    const movie = new Movie({ title, date, image, shortdesc, longdesc, trailer });
     const savedMovie = await movie.save();
     res.status(201).json(savedMovie);
   } catch (err) {
@@ -125,7 +114,8 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.patch('/block/:id', async (req, res) => {
+// ✅ Updated: Block user
+router.put('/users/:id/block', async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, { isBlocked: true });
     res.json({ message: 'User blocked' });
@@ -134,7 +124,8 @@ router.patch('/block/:id', async (req, res) => {
   }
 });
 
-router.patch('/unblock/:id', async (req, res) => {
+// ✅ Updated: Unblock user
+router.put('/users/:id/unblock', async (req, res) => {
   try {
     await User.findByIdAndUpdate(req.params.id, { isBlocked: false });
     res.json({ message: 'User unblocked' });

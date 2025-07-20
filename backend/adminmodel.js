@@ -6,6 +6,7 @@ const movieSchema = new mongoose.Schema({
   image: { type: String }, // Poster URL
   shortdesc: { type: String },
   longdesc: { type: String },
+  trailer: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

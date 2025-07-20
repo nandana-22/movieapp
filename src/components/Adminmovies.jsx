@@ -4,13 +4,15 @@ import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography, Box, IconButton,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, Button
+  TextField, Button, MenuItem, Select, InputLabel, FormControl
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 
-const AdminMovies = () => {
+const genres = ['Action', 'Drama', 'Comedy', 'Romance', 'Thriller', 'Family', 'Fantasy', 'Sci-Fi', 'Other'];
+
+const Adminmovies = () => {
   const [movies, setMovies] = useState([]);
   const [editMovie, setEditMovie] = useState(null);
   const [open, setOpen] = useState(false);
@@ -50,7 +52,15 @@ const AdminMovies = () => {
   };
 
   const handleAddClick = () => {
-    setEditMovie({ title: '', date: '', image: '', shortdesc: '', longdesc: '' });
+    setEditMovie({
+      title: '',
+      date: '',
+      image: '',
+      shortdesc: '',
+      longdesc: '',
+      trailer: '',
+      genre: ''
+    });
     setOpen(true);
   };
 
@@ -62,12 +72,10 @@ const AdminMovies = () => {
     try {
       const token = localStorage.getItem('token');
       if (editMovie._id) {
-        // Update existing movie
         await axios.put(`http://localhost:5000/api/admin/movies/${editMovie._id}`, editMovie, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        // Create new movie
         await axios.post('http://localhost:5000/api/admin/movies', editMovie, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -80,7 +88,7 @@ const AdminMovies = () => {
   };
 
   return (
-    <Box p={3}>
+    <Box sx={{ backgroundColor: '#111', minHeight: '100vh', padding: 3, color: 'white' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h4">All Movies</Typography>
         <Button
@@ -93,23 +101,25 @@ const AdminMovies = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 1000, tableLayout: 'fixed' }}>
+      <TableContainer component={Paper} sx={{ backgroundColor: '#1e1e1e' }}>
+        <Table sx={{ minWidth: 1200, tableLayout: 'fixed' }}>
           <TableHead>
             <TableRow>
-              <TableCell><strong>Title</strong></TableCell>
-              <TableCell><strong>Date</strong></TableCell>
-              <TableCell><strong>Poster</strong></TableCell>
-              <TableCell><strong>Short Description</strong></TableCell>
-              <TableCell><strong>Long Description</strong></TableCell>
-              <TableCell><strong>Actions</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Title</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Date</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Poster</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Short Description</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Long Description</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Trailer</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Genre</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Actions</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {movies.map((movie) => (
               <TableRow key={movie._id}>
-                <TableCell>{movie.title}</TableCell>
-                <TableCell>
+                <TableCell sx={{ color: 'white' }}>{movie.title}</TableCell>
+                <TableCell sx={{ color: 'white' }}>
                   {movie.date
                     ? new Date(movie.date).toLocaleDateString('en-US', {
                         month: 'long',
@@ -119,14 +129,7 @@ const AdminMovies = () => {
                 </TableCell>
                 <TableCell>
                   <img
-                    src={
-                      movie.image.includes('themoviedb.org/t/p/')
-                        ? movie.image.replace(
-                            'www.themoviedb.org/t/p/original',
-                            'image.tmdb.org/t/p/w500'
-                          )
-                        : movie.image
-                    }
+                    src={movie.image}
                     alt={movie.title}
                     style={{
                       width: '80px',
@@ -139,8 +142,16 @@ const AdminMovies = () => {
                     }}
                   />
                 </TableCell>
-                <TableCell>{movie.shortdesc}</TableCell>
-                <TableCell>{movie.longdesc}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{movie.shortdesc}</TableCell>
+                <TableCell sx={{ color: 'white' }}>{movie.longdesc}</TableCell>
+                <TableCell sx={{ color: 'white' }}>
+                  {movie.trailer ? (
+                    <a href={movie.trailer} target="_blank" rel="noopener noreferrer" style={{ color: '#64b5f6' }}>
+                      Watch
+                    </a>
+                  ) : 'N/A'}
+                </TableCell>
+                <TableCell sx={{ color: 'white' }}>{movie.genre || 'N/A'}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleEditClick(movie)} color="primary">
                     <EditIcon />
@@ -155,7 +166,6 @@ const AdminMovies = () => {
         </Table>
       </TableContainer>
 
-      {/* Reused Dialog for Add/Edit */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editMovie?._id ? 'Edit Movie' : 'Add New Movie'}</DialogTitle>
         <DialogContent>
@@ -201,6 +211,27 @@ const AdminMovies = () => {
             multiline
             rows={4}
           />
+          <TextField
+            margin="dense"
+            label="Trailer URL"
+            name="trailer"
+            value={editMovie?.trailer || ''}
+            onChange={handleChange}
+            fullWidth
+          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Genre</InputLabel>
+            <Select
+              name="genre"
+              value={editMovie?.genre || ''}
+              onChange={handleChange}
+              label="Genre"
+            >
+              {genres.map((g) => (
+                <MenuItem key={g} value={g}>{g}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="secondary">Cancel</Button>
@@ -213,4 +244,4 @@ const AdminMovies = () => {
   );
 };
 
-export default AdminMovies;
+export default Adminmovies;

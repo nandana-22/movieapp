@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  Box, Card, CardMedia, CardContent, Typography, Dialog,
+  Box, Card, CardContent, Typography, Dialog,
   DialogTitle, DialogContent, Button, Select, MenuItem,
   InputLabel, FormControl
 } from '@mui/material';
@@ -71,12 +71,24 @@ const Admin = () => {
   };
 
   const stats = [
-    { label: 'Movies', count: movies.length, icon: <MovieIcon fontSize="large" color="primary" />, bgColor: '#6A1B9A', category: 'content', details: `Total movies in the database: ${movies.length}` },
-    { label: 'Users', count: userCount, icon: <PeopleIcon fontSize="large" color="secondary" />, bgColor: '#43A047', category: 'people', details: `Registered users: ${userCount}` },
-    { label: 'Reviews', count: 1432, icon: <RateReviewIcon fontSize="large" color="error" />, bgColor: '#E53935', category: 'content', details: 'Total reviews: 1432' },
-    { label: 'Likes', count: 2000, icon: <ThumbUpIcon fontSize="large" color="primary" />, bgColor: '#FB8C00', category: 'interaction', details: 'Total likes on reviews: 2000' },
-    { label: 'Comments', count: 900, icon: <CommentIcon fontSize="large" color="info" />, bgColor: '#3949AB', category: 'interaction', details: 'Total comments: 900' },
-  ];
+  {
+    label: 'Movies',
+    count: movies.length,
+    icon: <MovieIcon fontSize="large" />,
+    bgColor: '#d32f2f',
+    category: 'content',
+    details: `Total movies in the database: ${movies.length}`
+  },
+  {
+    label: 'Users',
+    count: userCount,
+    icon: <PeopleIcon fontSize="large" />,
+    bgColor: '#1976d2',
+    category: 'people',
+    details: `Registered users: ${userCount}`
+  }
+];
+
 
   const filteredStats = filter === 'all' ? stats : stats.filter(stat => stat.category === filter);
 
@@ -86,30 +98,32 @@ const Admin = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)',
+        background: 'linear-gradient(to bottom, #0f2027, #203a43, #2c5364)',
         p: 4,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        color: 'white',
         width: '100vw',
         boxSizing: 'border-box',
         overflowX: 'hidden',
       }}
     >
-      <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center" color="#333">
-        Welcome to the Admin Dashboard
+      <Typography variant="h4" fontWeight="bold" mb={3} textAlign="center">
+        🎬 Admin Dashboard
       </Typography>
 
       <Box sx={{ width: 200, mb: 4 }}>
-        <FormControl fullWidth>
-          <InputLabel id="filter-label">Filter</InputLabel>
+        <FormControl fullWidth variant="filled">
+          <InputLabel sx={{ color: '#ccc' }}>Filter</InputLabel>
           <Select
-            labelId="filter-label"
-            id="filter-select"
             value={filter}
-            label="Filter"
             onChange={(e) => setFilter(e.target.value)}
+            sx={{
+              color: 'white',
+              backgroundColor: '#263238',
+              '& .MuiSvgIcon-root': { color: 'white' }
+            }}
           >
             <MenuItem value="all">All</MenuItem>
             <MenuItem value="content">Content</MenuItem>
@@ -127,38 +141,41 @@ const Admin = () => {
           flexWrap: 'wrap',
           width: '100%',
           maxWidth: '1200px',
-          margin: '0 auto',
         }}
       >
         {filteredStats.map(({ label, count, icon, bgColor, details }) => (
           <Card
             key={label}
             sx={{
-              minWidth: 150,
+              minWidth: 180,
+              maxWidth: 250,
               textAlign: 'center',
               p: 2,
-              backgroundColor: bgColor,
+              background: bgColor,
               cursor: 'pointer',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              '&:hover': {
-                transform: 'translateY(-8px)',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.2)',
-              },
+              borderRadius: 3,
               color: 'white',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 6px 30px rgba(0,0,0,0.7)',
+              },
             }}
             onClick={() => handleClickOpen({ label, details })}
           >
             <CardContent>
-              {icon}
-              <Typography variant="h4" component="div" sx={{ mt: 1 }}>
-                {count}
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
+                {icon}
+              </Box>
+              <Typography variant="h5" fontWeight="bold">{count}</Typography>
               <Typography>{label}</Typography>
             </CardContent>
           </Card>
         ))}
       </Box>
 
+      {/* Details Dialog */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{selectedStat?.label} Details</DialogTitle>
         <DialogContent>

@@ -11,13 +11,15 @@ import AdminNavbar from './components/Navbaradmin';
 // User Components
 import Navbar from './components/Navbar';
 import MovieList from './components/Movielist';
-import Login from './components/Login'; 
+import Login from './components/Login';
+import Signupp from './components/Signupp';
 import HomeAttractive from './components/Homeattractive';
+import Forgotpassword from './components/Forgotpassword'; // ✅ Import
 
 function AppRoutes({ isLoggedIn, setIsLoggedIn }) {
   return (
     <Routes>
-      {/* Login Route */}
+      {/* Login */}
       <Route
         path="/login"
         element={
@@ -25,7 +27,18 @@ function AppRoutes({ isLoggedIn, setIsLoggedIn }) {
         }
       />
 
-      {/* Home (after login) */}
+      {/* Signup */}
+      <Route
+        path="/signup"
+        element={
+          isLoggedIn ? <Navigate to="/home" replace /> : <Signupp />
+        }
+      />
+
+      {/* Forgot Password ✅ */}
+      <Route path="/forgot-password" element={<Forgotpassword />} />
+
+      {/* Home */}
       <Route
         path="/home"
         element={
@@ -55,13 +68,7 @@ function AppRoutes({ isLoggedIn, setIsLoggedIn }) {
         }
       />
 
-      {/* Default route → redirect to login or home */}
-      <Route
-        path="/"
-        element={<Navigate to={isLoggedIn ? '/home' : '/login'} replace />}
-      />
-
-      {/* ADMIN Routes */}
+      {/* Admin */}
       <Route path="/adminlogin" element={<AdminLogin />} />
       <Route
         path="/admin"
@@ -75,7 +82,11 @@ function AppRoutes({ isLoggedIn, setIsLoggedIn }) {
       <Route path="/admin/users" element={<AdminUsers />} />
       <Route path="/admin/movies" element={<AdminMovies />} />
 
-      {/* 404 Page */}
+      {/* Default & 404 */}
+      <Route
+        path="/"
+        element={<Navigate to={isLoggedIn ? '/home' : '/login'} replace />}
+      />
       <Route path="*" element={<h2 style={{ padding: '40px' }}>404 - Not Found</h2>} />
     </Routes>
   );

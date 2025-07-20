@@ -69,33 +69,25 @@ const AdminUsers = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f0f4f8, #d9e2ec)',
-        p: 4,
-        width: '100vw',
-        boxSizing: 'border-box',
-      }}
-    >
-      <Typography variant="h5" gutterBottom sx={{ mb: 3, color: '#333' }}>
+    <Box sx={{ backgroundColor: '#111', minHeight: '100vh', padding: 3, color: 'white' }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
         👤 Admin User Management
       </Typography>
 
-      <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#f0f0f0' }}>
+      <TableContainer component={Paper} sx={{ backgroundColor: '#1e1e1e' }}>
+        <Table sx={{ minWidth: 600 }}>
+          <TableHead>
             <TableRow>
-              <TableCell><strong>Email</strong></TableCell>
-              <TableCell><strong>Status</strong></TableCell>
-              <TableCell><strong>Actions</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Email</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Status</strong></TableCell>
+              <TableCell sx={{ color: 'white' }}><strong>Actions</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
               <TableRow key={user._id}>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
+                <TableCell sx={{ color: 'white' }}>{user.email}</TableCell>
+                <TableCell sx={{ color: user.isBlocked ? 'tomato' : 'lightgreen' }}>
                   {user.isBlocked ? '🚫 Blocked' : '🟢 Active'}
                 </TableCell>
                 <TableCell>
@@ -120,7 +112,7 @@ const AdminUsers = () => {
             ))}
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={3} align="center" sx={{ color: 'gray' }}>
                   No users found.
                 </TableCell>
               </TableRow>

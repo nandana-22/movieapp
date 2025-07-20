@@ -7,14 +7,18 @@ import {
   Typography,
   Button,
   Link,
+  Alert,
 } from '@mui/material';
 
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // success | error | warning
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
+    setMessage('');
     try {
       const response = await fetch("http://localhost:5000/api/user/login", {
         method: "POST",
@@ -25,17 +29,27 @@ const Login = ({ setIsLoggedIn }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token to localStorage
-        localStorage.setItem('token', data.token); // Adjust 'data.token' if your backend uses a different key
+        localStorage.setItem('token', data.token);
         setIsLoggedIn(true);
-        alert("Login successful!");
-        navigate('/home');
+        setMessageType('success');
+        setMessage('✅ Login successful!');
+        setTimeout(() => navigate('/home'), 1000); // redirect after short delay
       } else {
-        alert(data.message || "Login failed");
+        if (response.status === 403) {
+          setMessageType('error');
+          setMessage('❌ Your account is blocked.');
+        } else if (response.status === 401) {
+          setMessageType('warning');
+          setMessage('⚠️ Invalid email or password.');
+        } else {
+          setMessageType('error');
+          setMessage(data.message || 'Something went wrong!');
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong!");
+      setMessageType('error');
+      setMessage("⚠️ Server error. Please try again.");
     }
   };
 
@@ -69,13 +83,18 @@ const Login = ({ setIsLoggedIn }) => {
           Login to MovieHub
         </Typography>
 
+        {message && (
+          <Alert severity={messageType} sx={{ mt: 2, mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+
         <TextField
           fullWidth
           variant="outlined"
           label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          color="primary"
           margin="normal"
         />
 
@@ -86,7 +105,6 @@ const Login = ({ setIsLoggedIn }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          color="primary"
           margin="normal"
         />
 
@@ -104,7 +122,12 @@ const Login = ({ setIsLoggedIn }) => {
         </Button>
 
         <Typography variant="body2" sx={{ mt: 2 }} align="center">
-          <Link href="#" underline="hover" sx={{ color: '#1976d2' }}>
+          <Link
+            component="button"
+            onClick={() => navigate('/forgot-password')}
+            underline="hover"
+            sx={{ color: '#1976d2' }}
+          >
             Forgot Password?
           </Link>
         </Typography>
