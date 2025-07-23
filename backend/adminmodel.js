@@ -4,6 +4,7 @@ const movieSchema = new mongoose.Schema({
   title: { type: String, required: true },
   date: { type: String }, // e.g., "July 21, 2023"
   image: { type: String }, // Poster URL
+  genre: { type: String, required: true }, // ✅ Add this line
   shortdesc: { type: String },
   longdesc: { type: String },
   trailer: { type: String },
